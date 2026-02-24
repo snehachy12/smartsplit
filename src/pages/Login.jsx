@@ -87,7 +87,8 @@ export default function Login() {
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-12 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    // Added text and bg color utilities here to fix visibility
+                    className="pl-10 h-12 text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-950 focus:ring-2 focus:ring-purple-500/20 transition-all"
                     required
                   />
                 </div>
@@ -105,13 +106,14 @@ export default function Login() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 h-12 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    // Added text and bg color utilities here to fix visibility
+                    className="pl-10 pr-10 h-12 text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-950 focus:ring-2 focus:ring-purple-500/20 transition-all"
                     required
                   />
                   <motion.button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >

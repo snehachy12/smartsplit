@@ -301,7 +301,7 @@ export default function Landing() {
               Split Bills,
             </span>
             <br />
-            <span className="text-foreground">Not Friendships</span>
+            <span className="text-slate-900 dark:text-white">Not Friendships</span>
           </motion.h1>
 
           {/* Subheading */}
@@ -481,7 +481,8 @@ export default function Landing() {
                     <div className={`w-20 h-20 mx-auto mb-6 bg-gradient-to-br ${step.color} rounded-3xl flex items-center justify-center shadow-xl`}>
                       <step.icon className="w-10 h-10 text-white" />
                     </div>
-                    <div className="text-6xl font-bold text-slate-200 dark:text-slate-800 mb-4">
+                    {/* FIXED: text-slate-800 in light mode, text-slate-200 in dark mode, with opacity */}
+                    <div className="text-6xl font-bold text-slate-800 dark:text-slate-200 opacity-20 mb-4">
                       {step.step}
                     </div>
                     <h3 className="text-2xl font-bold mb-3">{step.title}</h3>

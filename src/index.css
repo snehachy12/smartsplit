@@ -62,9 +62,9 @@
   --ring: 212.7 26.8% 83.9%;
 }
 
-
 body {
-  @apply bg-[var(--bg)] text-slate-100 antialiased overflow-x-hidden font-sans;
+  /* FIXED: Using var(--text) so it respects your body.light theme! */
+  @apply bg-[var(--bg)] text-[var(--text)] antialiased overflow-x-hidden font-sans;
 }
 
 .gradient-glow {
@@ -74,12 +74,10 @@ body {
 }
 
 @keyframes glow {
-
   0%,
   100% {
     background-position: 0% 50%;
   }
-
   50% {
     background-position: 100% 50%;
   }
