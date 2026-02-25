@@ -435,9 +435,9 @@ export default function Landing() {
                 <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
                   <stat.icon className="w-8 h-8 text-white" />
                 </div>
-                <div className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-cyan-600">
+                <div className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">
                   <AnimatedCounter end={stat.value} />
-                  {stat.suffix}
+                  <span className="text-purple-600 dark:text-purple-400">{stat.suffix}</span>
                 </div>
                 <div className="text-muted-foreground mt-2">{stat.label}</div>
               </motion.div>
@@ -456,7 +456,7 @@ export default function Landing() {
             className="text-center mb-16"
           >
             <Badge className="mb-4">How It Works</Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900 dark:text-white">
               Get started in
               <br />
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-cyan-600">
@@ -510,7 +510,7 @@ export default function Landing() {
             className="text-center mb-16"
           >
             <Badge className="mb-4 bg-gradient-to-r from-purple-600 to-cyan-600 text-white border-0">Features</Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900 dark:text-white">
               Everything you need to
               <br />
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-cyan-600">
@@ -576,7 +576,7 @@ export default function Landing() {
             className="text-center mb-16"
           >
             <Badge className="mb-4">Comparison</Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900 dark:text-white">
               Why choose
               <br />
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-cyan-600">

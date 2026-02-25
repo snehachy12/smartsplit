@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "../App";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import SummaryCard from "../Dashboard/SummaryCard";
 import {
   UserPlus,
   Wallet,
