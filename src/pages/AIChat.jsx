@@ -12,7 +12,8 @@ import {
     Loader2,
     Bot,
     User,
-    AlertCircle
+    AlertCircle,
+    Scale
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -20,19 +21,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 
+// 🔥 TIER-S UPGRADE: Psychological, decision-first prompts instead of basic calculator prompts
 const quickPrompts = [
-    { icon: Calculator, label: "Calculate split", color: "purple", prompt: "Help me calculate how to split a bill equally" },
-    { icon: Receipt, label: "Scan receipt", color: "cyan", prompt: "How do I scan and add a receipt?" },
-    { icon: Users, label: "Group summary", color: "green", prompt: "Give me a summary of my group expenses" },
-    { icon: TrendingUp, label: "Spending trends", color: "orange", prompt: "Show me my spending trends this month" },
-    { icon: PieChart, label: "Budget plan", color: "pink", prompt: "Help me create a budget plan" },
+    { icon: Scale, label: "Check Fairness", color: "purple", prompt: "Is our group fair right now? Who has been paying too much lately and who should pay next to avoid awkwardness?" },
+    { icon: TrendingUp, label: "Expense Spikes", color: "orange", prompt: "Where have our expenses increased recently? Are we overspending?" },
+    { icon: Sparkles, label: "My Persona", color: "pink", prompt: "Based on my expenses, what is my spending psychology? Am I a Planner, Spontaneous, or an Avoider?" },
+    { icon: Users, label: "Settle Smartly", color: "cyan", prompt: "What's the easiest way to settle all our current debts with the absolute minimum number of transactions?" },
 ];
 
 export default function AIChat() {
     const [messages, setMessages] = useState([
         {
             role: "assistant",
-            content: "Hi! I'm your SmartSplit AI assistant. I can help you analyze expenses, suggest splits, create summaries, and more. How can I help you today?",
+            content: "Hi! I'm your SmartSplit AI mediator. I don't just calculate numbers—I help keep your group balanced, track where your expenses are spiking, and make settling up totally awkward-free. What's on your mind?",
         },
     ]);
     const [input, setInput] = useState("");
@@ -41,7 +42,6 @@ export default function AIChat() {
 
     // Initialize Gemini API
     const apiKey = import.meta.env.VITE_GOOGLE_AI_KEY;
-    console.log("API Key present:", !!apiKey); // Debug log
     const genAI = new GoogleGenerativeAI(apiKey || "");
 
     const scrollToBottom = () => {
@@ -52,26 +52,6 @@ export default function AIChat() {
         scrollToBottom();
     }, [messages]);
 
-    // Debug: List available models
-    useEffect(() => {
-        const listModels = async () => {
-            if (!genAI) return;
-            try {
-                // Not the most standard way in some SDK versions, but let's try to get info if possible
-                // Or simply log that we are trying to connect
-                console.log("Attempting to connect with key:", apiKey ? "Present" : "Missing");
-
-                // There isn't a direct "listModels" on genAI instance in all SDK versions easily accessible on client 
-                // without admin rights in some contexts, but let's try a simple generation to test access
-                // If 404 persists, it's definitely the model name.
-
-            } catch (e) {
-                console.error("Debug Error:", e);
-            }
-        };
-        listModels();
-    }, []);
-
     const getContextData = () => {
         try {
             const expenses = JSON.parse(localStorage.getItem("smartsplit_expenses_v1") || "[]");
@@ -79,7 +59,7 @@ export default function AIChat() {
             const participants = JSON.parse(localStorage.getItem("smartsplit_participants_v1") || "[]");
 
             return JSON.stringify({
-                expenses: expenses.slice(0, 20), // Limit to recent expenses to avoid lighting up token limits
+                expenses: expenses.slice(0, 30), // Send last 30 expenses to analyze trends
                 budgets,
                 participants,
                 summary: `User has ${expenses.length} expenses recorded and ${participants.length} participants.`
@@ -99,33 +79,41 @@ export default function AIChat() {
         setIsLoading(true);
 
         try {
+            if (!apiKey) throw new Error("Google Gemini API Key is missing in your .env file.");
+
             const context = getContextData();
 
+            // 🔥 TIER-S UPGRADE: The System Prompt that gives the AI its psychological mediator persona
             const prompt = `
-            You are SmartSplit AI, a financial assistant for a bill splitting app. 
+            You are SmartSplit AI, an empathetic, psychological financial mediator for a bill-splitting app. 
+            Do not just act like a calculator. Act like a friendly financial coach who wants to prevent arguments between friends.
             
             Context Data (JSON):
             ${context}
             
             User Question: ${userMessage.content}
             
-            Instructions:
-            1. Be helpful, concise, and friendly.
-            2. Use the provided JSON data to answer questions about expenses, budgets, or participants if relevant.
-            3. If the user asks about something not in the data, give general financial advice or explain you don't have that info.
-            4. Format your response nicely (you can use markdown).
-            5. Do NOT mention "JSON data" or "context" explicitly to the user. Just answer naturally.
+            Tier-S Instructions:
+            1. Fairness & Imbalance: If the user asks about the group, detect if one person is paying repeatedly. Suggest who should pay next to avoid "silent resentment".
+            2. Expense Spikes: If asked about spending trends, point out exactly which categories are increasing and warn them if it will stress their budget.
+            3. Spending Behavior Insights: If asked about their persona, label them (e.g., 'The Planner', 'The Spontaneous Spender', 'The Avoider') based on the frequency and categories of their expenses in the JSON.
+            4. Smart Settlements: When asked to settle, suggest the easiest, most direct path (minimum transactions).
+            5. Tone: Be concise, friendly, and conversational. Use emojis.
+            6. DO NOT mention "JSON data" or "Context" to the user. Speak naturally as if you just "know" their app history.
             `;
 
-            const text = await generateResponse(prompt);
+            // 🔥 FIXED: Actual implementation of the Gemini API call
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const result = await model.generateContent(prompt);
+            const text = result.response.text();
+
             setMessages((prev) => [...prev, { role: "assistant", content: text }]);
         } catch (error) {
-            console.error("All AI Models failed:", error);
-
+            console.error("AI Generation failed:", error);
             const errorMessage = error.message || "Unknown error";
             setMessages((prev) => [...prev, {
                 role: "assistant",
-                content: `⚠️ Error: Helper could not connect. \n\nDetails: ${errorMessage}\n\nPlease check your internet or API key.`,
+                content: `⚠️ AI Connection Error \n\nDetails: ${errorMessage}\n\nPlease check your VITE_GOOGLE_AI_KEY in your .env file and ensure you have internet access.`,
                 isError: true
             }]);
         } finally {
@@ -135,6 +123,8 @@ export default function AIChat() {
 
     const handleQuickPrompt = (prompt) => {
         setInput(prompt);
+        // Optional: Automatically send when a quick prompt is clicked
+        // setTimeout(() => handleSend(), 100); 
     };
 
     const handleKeyDown = (e) => {
@@ -161,10 +151,10 @@ export default function AIChat() {
                             <Sparkles className="w-8 h-8 text-white" />
                         </div>
                         <h1 className="text-3xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-cyan-200">
-                            AI Assistant
+                            AI Group Mediator
                         </h1>
                         <p className="text-base md:text-lg text-slate-300 max-w-2xl mx-auto font-light">
-                            Get intelligent insights about your expenses, splits, and financial planning
+                            Don't just calculate splits. Get psychological insights, fairness checks, and smart budget warnings.
                         </p>
                     </motion.div>
                 </div>
@@ -178,7 +168,7 @@ export default function AIChat() {
                         animate={{ opacity: 1, y: 0 }}
                         className="mb-8"
                     >
-                        <h2 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">Quick Actions</h2>
+                        <h2 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">Suggested Actions</h2>
                         <div className="flex flex-wrap gap-2">
                             {quickPrompts.map((prompt, i) => (
                                 <motion.div
@@ -191,7 +181,7 @@ export default function AIChat() {
                                 >
                                     <Badge
                                         variant="secondary"
-                                        className="h-9 cursor-pointer gap-2 text-sm rounded-lg backdrop-blur-sm bg-white/80 dark:bg-slate-800/80 hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-all px-4 shadow-md hover:shadow-lg"
+                                        className="h-9 cursor-pointer gap-2 text-sm rounded-lg backdrop-blur-sm bg-white/80 dark:bg-slate-800/80 hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-all px-4 shadow-md hover:shadow-lg border border-slate-200 dark:border-slate-700"
                                         onClick={() => handleQuickPrompt(prompt.prompt)}
                                     >
                                         <prompt.icon className={`h-4 w-4 text-${prompt.color}-500`} />
@@ -223,10 +213,10 @@ export default function AIChat() {
 
                                     <motion.div
                                         className={`max-w-[80%] rounded-2xl px-5 py-3 shadow-md ${message.role === "user"
-                                            ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-tr-none"
-                                            : message.isError
-                                                ? "bg-red-50 dark:bg-red-900/20 text-red-600 border border-red-200 dark:border-red-800 rounded-tl-none"
-                                                : "backdrop-blur-sm bg-slate-100/80 dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 rounded-tl-none"
+                                                ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-tr-none"
+                                                : message.isError
+                                                    ? "bg-red-50 dark:bg-red-900/20 text-red-600 border border-red-200 dark:border-red-800 rounded-tl-none"
+                                                    : "backdrop-blur-sm bg-slate-100/80 dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 rounded-tl-none border border-slate-200 dark:border-slate-700"
                                             }`}
                                         whileHover={{ scale: 1.01 }}
                                         transition={{ duration: 0.2 }}
@@ -252,9 +242,9 @@ export default function AIChat() {
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-cyan-600 flex items-center justify-center flex-shrink-0 mt-1 shadow-md">
                                     <Bot className="w-5 h-5 text-white" />
                                 </div>
-                                <div className="backdrop-blur-sm bg-slate-100/80 dark:bg-slate-800/80 rounded-2xl rounded-tl-none px-4 py-3 shadow-md flex items-center gap-2">
+                                <div className="backdrop-blur-sm bg-slate-100/80 dark:bg-slate-800/80 rounded-2xl rounded-tl-none px-4 py-3 shadow-md flex items-center gap-2 border border-slate-200 dark:border-slate-700">
                                     <Loader2 className="h-4 w-4 animate-spin text-purple-600" />
-                                    <span className="text-xs text-muted-foreground animate-pulse">Thinking...</span>
+                                    <span className="text-xs text-muted-foreground animate-pulse">Analyzing expenses and group fairness...</span>
                                 </div>
                             </motion.div>
                         )}
@@ -267,18 +257,18 @@ export default function AIChat() {
                     <CardContent className="p-4">
                         <div className="flex gap-2 items-end">
                             <Textarea
-                                placeholder="Ask me about your spending, split calculations, or budgeting advice..."
+                                placeholder="Ask me about spending spikes, fairness, or who owes what..."
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyDown}
-                                className="min-h-[50px] max-h-[120px] resize-none border-none shadow-none focus-visible:ring-0 text-base"
+                                className="min-h-[50px] max-h-[120px] resize-none border-none shadow-none focus-visible:ring-0 text-base bg-transparent text-slate-900 dark:text-slate-100"
                                 rows={1}
                             />
                             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="pb-1">
                                 <Button
                                     onClick={handleSend}
                                     disabled={!input.trim() || isLoading}
-                                    className="self-end bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 shadow-lg hover:shadow-xl transition-all"
+                                    className="self-end bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 shadow-lg hover:shadow-xl transition-all text-white"
                                     size="icon"
                                 >
                                     <Send className="h-4 w-4" />

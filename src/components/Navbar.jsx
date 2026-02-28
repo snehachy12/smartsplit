@@ -572,9 +572,6 @@ export default function Navbar() {
 
                 {/* No Results State */}
                 {cmdQuery && filteredCommands.length === 0 && (
-                  // Checking if other sections are empty is complex inside render, typically we'd compute this outside
-                  // For now, we assume if filteredCommands matches nothing and we typed something, it might be data search
-                  // We'll rely on visual feedback if nothing shows up
                   null
                 )}
 
@@ -622,11 +619,13 @@ export default function Navbar() {
                   <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                     <PlusCircle className="text-purple-600 dark:text-purple-400 w-5 h-5" />
                   </div>
-                  <h3 className="font-semibold text-lg">Quick Add Expense</h3>
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-white">
+                    Quick Add Expense
+                  </h3>
                 </div>
                 <button
                   onClick={() => !qaSaving && setQuickAddOpen(false)}
-                  className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -634,16 +633,20 @@ export default function Navbar() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Expense Name</label>
+                  {/* FIXED: Label color */}
+                  <label className="text-sm font-medium mb-2 block text-slate-700 dark:text-slate-300">Expense Name</label>
+                  {/* FIXED: Input text and placeholder color */}
                   <input
                     value={qaName}
                     onChange={(e) => setQaName(e.target.value)}
                     placeholder="e.g., Dinner at Restaurant"
-                    className="w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-purple-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Amount (₹)</label>
+                  {/* FIXED: Label color */}
+                  <label className="text-sm font-medium mb-2 block text-slate-700 dark:text-slate-300">Amount (₹)</label>
+                  {/* FIXED: Input text and placeholder color */}
                   <input
                     value={qaAmount}
                     onChange={(e) => setQaAmount(e.target.value)}
@@ -651,15 +654,17 @@ export default function Navbar() {
                     type="number"
                     min="0"
                     step="0.01"
-                    className="w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-purple-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Category</label>
+                  {/* FIXED: Label color */}
+                  <label className="text-sm font-medium mb-2 block text-slate-700 dark:text-slate-300">Category</label>
+                  {/* FIXED: Select text color */}
                   <select
                     value={qaCategory}
                     onChange={(e) => setQaCategory(e.target.value)}
-                    className="w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-purple-500 text-slate-900 dark:text-slate-100"
                   >
                     <option>Food</option>
                     <option>Shopping</option>
@@ -676,7 +681,7 @@ export default function Navbar() {
                 <Button
                   onClick={handleQuickAddExpense}
                   disabled={qaSaving}
-                  className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700"
+                  className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 text-white"
                 >
                   {qaSaving ? "Saving..." : "Save Expense"}
                 </Button>
